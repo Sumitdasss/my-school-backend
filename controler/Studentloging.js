@@ -12,10 +12,10 @@ import path from "path";
 
 export const getStudentById = async (req, res) => {
   try {
-
     const { id } = req.query;
 
-    console.log("Student ID:", id);
+    console.log("Student ID received:", id);
+    console.log("Student ID type:", typeof id);
 
     if (!id) {
       return res.status(400).json({
@@ -24,10 +24,20 @@ export const getStudentById = async (req, res) => {
       });
     }
 
+    const studentId = Number(id);
+
+    if (!Number.isInteger(studentId) || studentId <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid Student ID: ${id}`,
+      });
+    }
+
     const student = await db
       .select()
       .from(Students)
-      .where(eq(Students.id, Number(id)));
+      .where(eq(Students.id, studentId))
+      .limit(1);
 
     console.log("Student Data:", student);
 
@@ -38,17 +48,19 @@ export const getStudentById = async (req, res) => {
       });
     }
 
-    return res.status(200).json(student[0]);
+    return res.status(200).json({
+      success: true,
+      data: student[0],
+    });
 
   } catch (error) {
-
     console.error("Get Student Error:", error);
 
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Failed to get student details",
+      error: error.message,
     });
-
   }
 };
 
