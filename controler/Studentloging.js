@@ -13,19 +13,23 @@ import path from "path";
 export const getStudentById = async (req, res) => {
   try {
 
-    const { id } = req.params;
+    const { id } = req.query;
 
     console.log("Student ID:", id);
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Student ID is required",
+      });
+    }
 
     const student = await db
       .select()
       .from(Students)
-      .where(
-        eq(
-          Students.id,
-          Number(id)
-        )
-      );
+      .where(eq(Students.id, Number(id)));
+
+    console.log("Student Data:", student);
 
     if (student.length === 0) {
       return res.status(404).json({
@@ -34,22 +38,17 @@ export const getStudentById = async (req, res) => {
       });
     }
 
-    return res.status(200).json({
-      success: true,
-      data: student[0],
-    });
+    return res.status(200).json(student[0]);
 
   } catch (error) {
 
-    console.error(
-      "Get Student Error:",
-      error
-    );
+    console.error("Get Student Error:", error);
 
     return res.status(500).json({
       success: false,
       message: error.message,
     });
+
   }
 };
 
