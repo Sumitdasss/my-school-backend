@@ -34,7 +34,7 @@ getMCQExams
 import { 
 getStudentById,
 updateStudent,
-deleteStudent
+deleteStudent1122
 
 } from "../controler/Studentloging.js";
 
@@ -69,6 +69,6 @@ router.post("/postquction",createMCQQuestion)
 router.delete("/deletquction/:id",deleteMCQQuestion)
 router.get("/getstudentlogindeta",getStudentById)
 router.post("/poststudentprofile",updateStudent)
-router.delete("/deletstudentprofile/:id",deleteStudent)
+router.delete("/deletstudentprofile/:id",deleteStudent1122)
 
 export default router;

@@ -234,7 +234,7 @@ export const updateStudent = async (req, res) => {
 // DELETE /api/student/:id
 // =====================================================
 
-export const deleteStudent = async (req, res) => {
+export const deleteStudent1122 = async (req, res) => {
 
   try {
 
