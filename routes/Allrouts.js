@@ -31,6 +31,12 @@ createMCQQuestion,
 deleteMCQQuestion,
 getMCQExams
 } from "../controler/mcqQuestionController.js";
+import { 
+getStudentById,
+updateStudent,
+deleteStudent
+
+} from "../controler/Studentloging.js";
 
 const router = express.Router();
 import upload from "../middleware/upload.js";
@@ -61,5 +67,8 @@ router.get("/getquction",getMCQQuestions)
 router.get("/getmcqexam",getMCQExams)
 router.post("/postquction",createMCQQuestion)
 router.delete("/deletquction/:id",deleteMCQQuestion)
+router.get("/getstudentlogindeta",getStudentById)
+router.post("/poststudentprofile",updateStudent)
+router.delete("/deletstudentprofile/:id",deleteStudent)
 
 export default router;

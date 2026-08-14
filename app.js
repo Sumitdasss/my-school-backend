@@ -27,6 +27,7 @@ app.use("/api/Exam", studentRoute);
 app.use("/api/Student", studentRoute);
 app.use("/api/ALLMCQEXAM", studentRoute);
 app.use("/api/mcq-questions", studentRoute);
+app.use("/api/studentlogin", studentRoute);
 
 
 app.use("/api/auth", authRoute);
