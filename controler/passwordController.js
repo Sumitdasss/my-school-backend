@@ -15,6 +15,10 @@ export const sendOTP = async (req, res) => {
   try {
     const { email } = req.body;
 
+    console.log("1️⃣ Email:", email);
+    console.log("2️⃣ EMAIL_USER exists:", !!process.env.EMAIL_USER);
+    console.log("3️⃣ EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
+
     if (!email) {
       return res.status(400).json({
         success: false,
@@ -22,21 +26,28 @@ export const sendOTP = async (req, res) => {
       });
     }
 
-    // Check user
+    console.log("4️⃣ Checking Student...");
+
     const student = await db
       .select()
       .from(Students)
       .where(eq(Students.email, email));
+
+    console.log("5️⃣ Student checked");
 
     const parent = await db
       .select()
       .from(Parent)
       .where(eq(Parent.email, email));
 
+    console.log("6️⃣ Parent checked");
+
     const teacher = await db
       .select()
       .from(Teacher)
       .where(eq(Teacher.email, email));
+
+    console.log("7️⃣ Teacher checked");
 
     if (
       student.length === 0 &&
@@ -49,55 +60,49 @@ export const sendOTP = async (req, res) => {
       });
     }
 
-    // Generate OTP
+    console.log("8️⃣ User found");
+
     const otp = Math.floor(
       100000 + Math.random() * 900000
     ).toString();
 
-    // 5 minutes
     const expiresAt = new Date(
       Date.now() + 5 * 60 * 1000
     );
 
-    // Delete previous OTP
+    console.log("9️⃣ OTP generated");
+
     await db
       .delete(OTP)
       .where(eq(OTP.email, email));
 
-    // Save OTP
+    console.log("🔟 Old OTP deleted");
+
     await db.insert(OTP).values({
       email,
       otp,
       expiresAt,
     });
 
-    // Send email
+    console.log("1️⃣1️⃣ OTP inserted");
+
+    console.log("1️⃣2️⃣ Sending email...");
+
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
       subject: "Password Reset OTP",
       html: `
         <div style="font-family:Arial;padding:20px">
-
           <h2>School Management System</h2>
-
           <p>Your password reset OTP is:</p>
-
-          <h1 style="color:#D4AF37">
-            ${otp}
-          </h1>
-
-          <p>
-            This OTP will expire in 5 minutes.
-          </p>
-
-          <p>
-            If you did not request this, please ignore this email.
-          </p>
-
+          <h1 style="color:#D4AF37">${otp}</h1>
+          <p>This OTP will expire in 5 minutes.</p>
         </div>
       `,
     });
+
+    console.log("1️⃣3️⃣ Email sent");
 
     return res.status(200).json({
       success: true,
@@ -106,11 +111,16 @@ export const sendOTP = async (req, res) => {
 
   } catch (error) {
 
-    console.error("Send OTP Error:", error);
+    console.error("🔥 SEND OTP ERROR");
+    console.error("Message:", error.message);
+    console.error("Code:", error.code);
+    console.error("Command:", error.command);
+    console.error("Response:", error.response);
 
     return res.status(500).json({
       success: false,
-      message: "Something went wrong",
+      message: error.message,
+      code: error.code,
     });
   }
 };
