@@ -110,13 +110,16 @@ export const sendOTP = async (req, res) => {
     });
 
   }catch (error) {
-  console.error("========== SEND OTP ERROR ==========");
-  console.error("Message:", error?.message);
-  console.error("Code:", error?.code);
-  console.error("Response:", error?.response);
-  console.error("Command:", error?.command);
-  console.error("Stack:", error?.stack);
-  console.error("====================================");
+
+  console.error(
+    "SEND_OTP_ERROR:",
+    JSON.stringify({
+      message: error?.message,
+      code: error?.code,
+      response: error?.response,
+      command: error?.command,
+    })
+  );
 
   return res.status(500).json({
     success: false,
