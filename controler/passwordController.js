@@ -111,7 +111,7 @@ export const sendOTP = async (req, res) => {
 
   } catch (error) {
 
-    console.error("🔥 SEND OTP ERROR");
+    console.error("Send OTP Error:", error);
     console.error("Message:", error.message);
     console.error("Code:", error.code);
     console.error("Command:", error.command);
