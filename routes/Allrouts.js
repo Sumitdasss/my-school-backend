@@ -68,7 +68,7 @@ router.get("/getmcqexam",getMCQExams)
 router.post("/postquction",createMCQQuestion)
 router.delete("/deletquction/:id",deleteMCQQuestion)
 router.get("/getstudentlogindeta",getStudentById)
-router.post("/poststudentprofile",updateStudent)
+router.put("/putstudentprofile/:id", upload.single("photo"),   updateStudent)
 router.delete("/deletstudentprofile/:id",deleteStudent1122)
 
 export default router;
