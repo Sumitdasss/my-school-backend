@@ -7,7 +7,7 @@ app.use(
   cors({
     origin: [
       "https://my-school-hc7r.vercel.app",
-      "http://localhost:3000",
+    
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
