@@ -34,6 +34,8 @@ app.use("/api/Student", studentRoute);
 app.use("/api/ALLMCQEXAM", studentRoute);
 app.use("/api/mcq-questions", studentRoute);
 app.use("/api/studentlogin", studentRoute);
+app.use("/api/chagepassword", studentRoute);
+app.use("/api/adminlogin", studentRoute);
 
 
 app.use("/api/auth", authRoute);

@@ -37,7 +37,8 @@ updateStudent,
 deleteStudent1122
 
 } from "../controler/Studentloging.js";
-
+import {adminLogin} from "../controler/adminController.js"
+import {resetPassword,verifyOTP,sendOTP} from "../controler/passwordController.js"
 const router = express.Router();
 import upload from "../middleware/upload.js";
 
@@ -70,5 +71,9 @@ router.delete("/deletquction/:id",deleteMCQQuestion)
 router.get("/getstudentlogindeta",getStudentById)
 router.put("/putstudentprofile/:id", upload.single("photo"),   updateStudent)
 router.delete("/deletstudentprofile/:id",deleteStudent1122)
+router.post("/sent-otp",sendOTP)
+router.post("/verifay-opt",verifyOTP)
+router.post("/resetpassword",resetPassword)
+router.post("/admin",adminLogin)
 
 export default router;
