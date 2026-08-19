@@ -3,20 +3,29 @@ import { MCQExams,MCQQuestions } from "../db/schema.js"
 
 export const  ADDMCQexam=async (req,res)=>{
 try{
-const {examName,
-      subject,
-      className,
-      section,
-      totalMarks,
-      duration,
-      examDate,
-      questions,}=req.body
+const {
+  examCode,
+  examName,
+  subject,
+  className,
+  section,
+  totalMarks,
+  duration,
+  examDate,
+  questions,
+} = req.body;
 
         if (!examName || !subject || !className) {
       return res.status(400).json({
         message: "Exam name, subject and class are required",
       });
     }
+    if (!examCode) {
+  return res.status(400).json({
+    success: false,
+    message: "Exam code is required",
+  });
+}
   if (!totalMarks || !duration) {
       return res.status(400).json({
         message: "Total marks and duration are required",
@@ -33,14 +42,14 @@ const {examName,
   const [exam] = await db
       .insert(MCQExams)
       .values({
-        examName,
-        subject,
-        className,
-        section: section || null,
-        totalMarks: Number(totalMarks),
-        duration: Number(duration),
-        examDate: examDate || null,
-        isActive: true,
+        examCode,
+    examName,
+    subject,
+    className,
+    section: section || null,
+    totalMarks: Number(totalMarks),
+    duration: Number(duration),
+    examDate: examDate || null,
       })
       .returning();
 

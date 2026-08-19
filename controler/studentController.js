@@ -1,5 +1,5 @@
 import { db } from "../db/index.js";
-import { Students } from "../db/schema.js";
+import { Students,MCQExams } from "../db/schema.js";
 import { eq, and } from "drizzle-orm";
 
 
@@ -139,9 +139,18 @@ export async function getStudentFilters(req, res) {
       .groupBy(Students.section);
 
 
+    const Examcode = await db
+      .select({
+        examCode: MCQExams.examCode,
+      })
+      .from(MCQExams)
+      .groupBy(MCQExams.examCode);
+
+
     return res.status(200).json({
       classes,
       sections,
+      Examcode
     });
 
   } catch (error) {

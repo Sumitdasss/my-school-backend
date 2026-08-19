@@ -391,9 +391,12 @@ export const AdmitCards = pgTable("AdmitCards", {
 // ======================================================
 // MCQ EXAMS
 // ======================================================
-
 export const MCQExams = pgTable("mcq_exams", {
   id: serial("id").primaryKey(),
+
+  examCode: varchar("exam_code", {
+    length: 50,
+  }).notNull().unique(),
 
   examName: varchar("exam_name", {
     length: 255,
@@ -413,7 +416,7 @@ export const MCQExams = pgTable("mcq_exams", {
 
   totalMarks: integer("total_marks").notNull(),
 
-  duration: integer("duration").notNull(), // minutes
+  duration: integer("duration").notNull(),
 
   examDate: date("exam_date"),
 
@@ -429,7 +432,6 @@ export const MCQExams = pgTable("mcq_exams", {
     .defaultNow()
     .notNull(),
 });
-
 
 // ======================================================
 // MCQ QUESTIONS
