@@ -1,6 +1,10 @@
 // controllers/omrController.js
 
+import { eq } from "drizzle-orm";
+
 import { calculateOMRResult } from "../services/omrService.js";
+import { db } from "../db/index.js";
+import { Students, MCQExams, OMRSubmissions } from "../db/schema.js";
 
 // ======================================
 // CHECK MANUAL OMR
@@ -12,12 +16,14 @@ export const checkManualOMR = async (req, res) => {
       examCode,
       setName,
       answers,
+      student,
     } = req.body;
 
     console.log("=================================");
     console.log("Exam Code:", examCode);
     console.log("Set Name:", setName);
     console.log("Answers:", answers);
+    console.log("Student:", student);
     console.log("=================================");
 
     // ================================
@@ -45,8 +51,74 @@ export const checkManualOMR = async (req, res) => {
       });
     }
 
+    if (!student) {
+      return res.status(400).json({
+        success: false,
+        message: "Student information is required",
+      });
+    }
+
     // ================================
-    // CALCULATE RESULT
+    // ROLL FROM OMR DIGITS
+    // ================================
+
+    const rollDigits = student.rollDigits || [];
+
+    const omrRoll = rollDigits
+      .filter((digit) => digit !== null && digit !== undefined)
+      .join("");
+
+    if (!omrRoll) {
+      return res.status(400).json({
+        success: false,
+        message: "OMR roll number is required",
+      });
+    }
+
+    console.log("OMR Roll:", omrRoll);
+
+    // ================================
+    // FIND STUDENT
+    // ================================
+
+    const studentData = await db
+      .select()
+      .from(Students)
+      .where(eq(Students.rollNumber, Number(omrRoll)));
+
+    if (studentData.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `Student with roll ${omrRoll} not found`,
+      });
+    }
+
+    const foundStudent = studentData[0];
+
+    console.log("Found Student:", foundStudent);
+
+    // ================================
+    // FIND EXAM
+    // ================================
+
+    const examData = await db
+      .select()
+      .from(MCQExams)
+      .where(eq(MCQExams.examCode, examCode.trim()));
+
+    if (examData.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Exam not found",
+      });
+    }
+
+    const exam = examData[0];
+
+    console.log("Found Exam:", exam);
+
+    // ================================
+    // CHECK RESULT
     // ================================
 
     const result = await calculateOMRResult({
@@ -56,22 +128,72 @@ export const checkManualOMR = async (req, res) => {
     });
 
     // ================================
+    // SAVE OMR SUBMISSION
+    // ================================
+
+    const registrationDigits = student.registrationDigits || [];
+
+    const registrationNumber = registrationDigits
+      .filter(
+        (digit) =>
+          digit !== null &&
+          digit !== undefined
+      )
+      .join("");
+
+    const submission = await db
+      .insert(OMRSubmissions)
+      .values({
+        studentId: foundStudent.id,
+
+        examId: exam.id,
+
+        setName,
+
+        rollDigits: omrRoll,
+
+        registrationDigits: registrationNumber || null,
+      })
+      .returning();
+
+    console.log(
+      "OMR Submission Saved:",
+      submission[0]
+    );
+
+    // ================================
     // RESPONSE
     // ================================
 
     return res.status(200).json({
       success: true,
+
       examCode,
+
       setName,
+
+      submissionId: submission[0].id,
+
+      student: {
+  id: foundStudent.id,
+  name: foundStudent.fullName,
+  roll: foundStudent.rollNumber,
+},
+
       result,
     });
 
   } catch (error) {
-    console.error("Manual OMR Check Error:", error);
+    console.error(
+      "Manual OMR Check Error:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
-      message: error.message || "OMR checking failed",
+      message:
+        error.message ||
+        "OMR checking failed",
     });
   }
 };

@@ -92,10 +92,19 @@ export const calculateOMRResult = async ({
     const questionNumber =
       Number(question.questionNumber);
 
-
+ console.log("================================");
+  console.log("Question Number:", questionNumber);
+  console.log("Detected Answers:", detectedAnswers);
+  console.log(
+    "Student Answer:",
+    detectedAnswers[questionNumber]
+  );
     // Student answer
     const studentAnswer =
-      detectedAnswers[questionNumber] ?? null;
+  detectedAnswers[String(questionNumber)] ??
+  detectedAnswers[questionNumber] ??
+  detectedAnswers[`q${questionNumber}`] ??
+  null;
 
 
     // Database correct answer

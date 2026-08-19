@@ -436,7 +436,43 @@ export const MCQExams = pgTable("mcq_exams", {
 // ======================================================
 // MCQ QUESTIONS
 // ======================================================
+export const OMRSubmissions = pgTable("omr_submissions", {
+  id: serial("id").primaryKey(),
 
+  // কোন Student exam দিয়েছে
+  studentId: integer("student_id")
+    .notNull()
+    .references(() => Students.id, {
+      onDelete: "cascade",
+    }),
+
+  // কোন Exam দিয়েছে
+  examId: integer("exam_id")
+    .notNull()
+    .references(() => MCQExams.id, {
+      onDelete: "cascade",
+    }),
+
+  // Set A / B / C / D
+  setName: varchar("set_name", {
+    length: 10,
+  }).notNull(),
+
+  // OMR sheet থেকে পাওয়া roll digits
+  rollDigits: varchar("roll_digits", {
+    length: 20,
+  }),
+
+  // OMR sheet থেকে পাওয়া registration digits
+  registrationDigits: varchar("registration_digits", {
+    length: 30,
+  }),
+
+  // কখন submit করেছে
+  submittedAt: timestamp("submitted_at", {
+    withTimezone: true,
+  }).defaultNow().notNull(),
+});
 export const MCQQuestions = pgTable("mcq_questions", {
   id: serial("id").primaryKey(),
 
