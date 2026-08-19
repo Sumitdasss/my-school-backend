@@ -7,7 +7,7 @@ app.use(
   cors({
     origin: [
       "https://my-school-hc7r.vercel.app",
-      "https://my-school-hc7r-pxectapsd-sumit-das-projects-f980d9ff.vercel.app",
+      "http://localhost:3000",
     ],
 
     methods: [
