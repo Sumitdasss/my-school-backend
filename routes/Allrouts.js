@@ -43,6 +43,7 @@ const router = express.Router();
 import upload from "../middleware/upload.js";
 
 import { checkManualOMR } from "../controler/omrController.js";
+import { studentAuth } from "../middleware/studentAuth.js";
 router.post("/register", upload.single("photo"), studentRegister);
 router.post("/Parentregister123", upload.single("photo"), ParentRegister);
 router.post("/Teacherregister123", upload.single("photo"), TeacherRegister);
@@ -76,6 +77,6 @@ router.post("/sent-otp",sendOTP)
 router.post("/verifay-opt",verifyOTP)
 router.post("/resetpassword",resetPassword)
 router.post("/admin",adminLogin)
-router.post("/cheak", checkManualOMR)
+router.post("/cheak",studentAuth, checkManualOMR)
 
 export default router;

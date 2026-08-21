@@ -34,16 +34,17 @@ export const studentLogin = async (req, res) => {
       });
     }
 
-    const token = jwt.sign(
-      {
-        id: studentData.id,
-        email: studentData.email,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      }
-    );
+   const token = jwt.sign(
+  {
+    studentId: studentData.id,
+    email: studentData.email,
+    role: "student",
+  },
+  process.env.JWT_SECRET,
+  {
+    expiresIn: "7d",
+  }
+);
 
     await db.insert(LoginHistory).values({
       studentId: studentData.id,
