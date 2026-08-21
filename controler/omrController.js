@@ -24,7 +24,7 @@ export const checkManualOMR = async (req, res) => {
       answers,
       student,
     } = req.body;
-
+const studentId = req.studentId;
     console.log("=================================");
     console.log("Exam Code:", examCode);
     console.log("Set Name:", setName);
@@ -87,19 +87,19 @@ export const checkManualOMR = async (req, res) => {
     // FIND STUDENT
     // ================================
 
-    const studentData = await db
-      .select()
-      .from(Students)
-      .where(eq(Students.rollNumber, Number(omrRoll)));
+    const loggedInStudent = await db
+  .select()
+  .from(Students)
+  .where(eq(Students.id, studentId));
 
-    if (studentData.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: `Student with roll ${omrRoll} not found`,
-      });
-    }
+if (loggedInStudent.length === 0) {
+  return res.status(404).json({
+    success: false,
+    message: "Logged-in student not found",
+  });
+}
 
-    const foundStudent = studentData[0];
+const foundStudent = loggedInStudent[0];
 
     console.log("Found Student:", foundStudent);
 
