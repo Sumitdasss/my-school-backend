@@ -44,6 +44,7 @@ import upload from "../middleware/upload.js";
 
 import { checkManualOMR } from "../controler/omrController.js";
 import { studentAuth } from "../middleware/studentAuth.js";
+import { getAllMCQResults,deleteMCQResult } from "../controler/mcqResultController.js";
 router.post("/register", upload.single("photo"), studentRegister);
 router.post("/Parentregister123", upload.single("photo"), ParentRegister);
 router.post("/Teacherregister123", upload.single("photo"), TeacherRegister);
@@ -78,5 +79,7 @@ router.post("/verifay-opt",verifyOTP)
 router.post("/resetpassword",resetPassword)
 router.post("/admin",adminLogin)
 router.post("/cheak",studentAuth, checkManualOMR)
+router.get("/getmcqresult",getAllMCQResults)
+router.delete("/deletmcqresult/:id",deleteMCQResult)
 
 export default router;

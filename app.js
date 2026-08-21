@@ -48,6 +48,7 @@ app.use("/api/studentlogin", studentRoute);
 app.use("/api/chagepassword", studentRoute);
 app.use("/api/adminlogin", studentRoute);
 app.use("/api/omr", studentRoute);
+app.use("/api/MCQresult", studentRoute);
 
 
 app.use("/api/auth", authRoute);
