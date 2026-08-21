@@ -171,6 +171,7 @@ export const checkManualOMR = async (req, res) => {
 const answerRow=result.details.map((detail)=>({
 submissionId:submission[0].id,
 selectedAnswer: detail.studentAnswer||null,
+studentId: foundStudent.id,
 questionId: detail.questionId,
 isCorrect:detail.status === "unanswer"? null :detail.isCorrect,
 

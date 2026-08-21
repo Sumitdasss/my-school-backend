@@ -572,12 +572,21 @@ export const MCQStudentAnswers = pgTable(
   {
     id: serial("id").primaryKey(),
 
+    // কোন Student
+    studentId: integer("student_id")
+      .notNull()
+      .references(() => Students.id, {
+        onDelete: "cascade",
+      }),
+
+    // কোন OMR Submission
     submissionId: integer("submission_id")
       .notNull()
       .references(() => OMRSubmissions.id, {
         onDelete: "cascade",
       }),
 
+    // কোন Question
     questionId: integer("question_id")
       .notNull()
       .references(() => MCQQuestions.id, {
@@ -618,7 +627,6 @@ export const MCQStudentAnswers = pgTable(
     ),
   })
 );
-
 // ======================================================
 // MCQ RESULTS
 // ======================================================
