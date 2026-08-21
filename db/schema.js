@@ -567,115 +567,133 @@ export const MCQAnswerSheets = pgTable("mcq_answer_sheets", {
 // MCQ STUDENT ANSWERS
 // ======================================================
 
-export const MCQStudentAnswers = pgTable("mcq_student_answers", {
-  id: serial("id").primaryKey(),
+export const MCQStudentAnswers = pgTable(
+  "mcq_student_answers",
+  {
+    id: serial("id").primaryKey(),
 
-  answerSheetId: integer("answer_sheet_id")
-    .notNull()
-    .references(() => MCQAnswerSheets.id, {
-      onDelete: "cascade",
+    submissionId: integer("submission_id")
+      .notNull()
+      .references(() => OMRSubmissions.id, {
+        onDelete: "cascade",
+      }),
+
+    questionId: integer("question_id")
+      .notNull()
+      .references(() => MCQQuestions.id, {
+        onDelete: "cascade",
+      }),
+
+    selectedAnswer: varchar("selected_answer", {
+      length: 1,
     }),
 
-  questionId: integer("question_id")
-    .notNull()
-    .references(() => MCQQuestions.id, {
-      onDelete: "cascade",
-    }),
+    isCorrect: boolean("is_correct"),
 
-  selectedAnswer: varchar("selected_answer", {
-    length: 1,
-  }),
+    marksObtained: integer("marks_obtained")
+      .default(0)
+      .notNull(),
 
-  isCorrect: boolean("is_correct"),
+    detectionConfidence: integer(
+      "detection_confidence"
+    ),
 
-  marksObtained: integer("marks_obtained")
-    .default(0)
-    .notNull(),
+    isManuallyCorrected: boolean(
+      "is_manually_corrected"
+    )
+      .default(false)
+      .notNull(),
 
-  // OMR scanner কতটা confident
-  detectionConfidence: integer(
-    "detection_confidence"
-  ),
+    createdAt: timestamp("created_at")
+      .defaultNow()
+      .notNull(),
+  },
 
-  isManuallyCorrected: boolean(
-    "is_manually_corrected"
-  )
-    .default(false)
-    .notNull(),
-
-  createdAt: timestamp("created_at")
-    .defaultNow()
-    .notNull(),
-}, (table) => ({
-  answerUnique: unique(
-    "mcq_student_answer_unique"
-  ).on(
-    table.answerSheetId,
-    table.questionId
-  ),
-}));
-
+  (table) => ({
+    answerUnique: unique(
+      "mcq_student_answer_unique"
+    ).on(
+      table.submissionId,
+      table.questionId
+    ),
+  })
+);
 
 // ======================================================
 // MCQ RESULTS
 // ======================================================
 
-export const MCQResults = pgTable("mcq_results", {
-  id: serial("id").primaryKey(),
+export const MCQResults = pgTable(
+  "mcq_results",
+  {
+    id: serial("id").primaryKey(),
 
-  examId: integer("exam_id")
-    .notNull()
-    .references(() => MCQExams.id, {
-      onDelete: "cascade",
-    }),
+    // কোন Exam
+    examId: integer("exam_id")
+      .notNull()
+      .references(() => MCQExams.id, {
+        onDelete: "cascade",
+      }),
 
-  studentId: integer("student_id")
-    .notNull()
-    .references(() => Students.id, {
-      onDelete: "cascade",
-    }),
+    // কোন Student
+    studentId: integer("student_id")
+      .notNull()
+      .references(() => Students.id, {
+        onDelete: "cascade",
+      }),
 
-  answerSheetId: integer("answer_sheet_id")
-    .references(() => MCQAnswerSheets.id, {
-      onDelete: "set null",
-    }),
+    // কোন OMR Submission থেকে result তৈরি হয়েছে
+    submissionId: integer("submission_id")
+      .notNull()
+      .references(() => OMRSubmissions.id, {
+        onDelete: "cascade",
+      }),
 
-  totalQuestions: integer("total_questions")
-    .notNull(),
+    // যদি পুরোনো AnswerSheet system থাকে
+    answerSheetId: integer("answer_sheet_id")
+      .references(() => MCQAnswerSheets.id, {
+        onDelete: "set null",
+      }),
 
-  correctAnswers: integer("correct_answers")
-    .default(0)
-    .notNull(),
+    totalQuestions: integer("total_questions")
+      .notNull(),
 
-  wrongAnswers: integer("wrong_answers")
-    .default(0)
-    .notNull(),
+    correctAnswers: integer("correct_answers")
+      .default(0)
+      .notNull(),
 
-  skippedAnswers: integer("skipped_answers")
-    .default(0)
-    .notNull(),
+    wrongAnswers: integer("wrong_answers")
+      .default(0)
+      .notNull(),
 
-  totalMarks: integer("total_marks")
-    .notNull(),
+    skippedAnswers: integer("skipped_answers")
+      .default(0)
+      .notNull(),
 
-  obtainedMarks: integer("obtained_marks")
-    .default(0)
-    .notNull(),
+    totalMarks: integer("total_marks")
+      .notNull(),
 
-  percentage: integer("percentage"),
+    obtainedMarks: integer("obtained_marks")
+      .default(0)
+      .notNull(),
 
-  createdAt: timestamp("created_at")
-    .defaultNow()
-    .notNull(),
+    percentage: integer("percentage"),
 
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .notNull(),
-}, (table) => ({
-  studentExamUnique: unique(
-    "mcq_student_exam_unique"
-  ).on(
-    table.examId,
-    table.studentId
-  ),
-}));
+    createdAt: timestamp("created_at")
+      .defaultNow()
+      .notNull(),
+
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .notNull(),
+  },
+
+  (table) => ({
+    studentExamUnique: unique(
+      "mcq_student_exam_unique"
+    ).on(
+      table.examId,
+      table.studentId
+    ),
+  })
+);

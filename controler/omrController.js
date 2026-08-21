@@ -4,7 +4,13 @@ import { eq } from "drizzle-orm";
 
 import { calculateOMRResult } from "../services/omrService.js";
 import { db } from "../db/index.js";
-import { Students, MCQExams, OMRSubmissions } from "../db/schema.js";
+import {
+  Students,
+  MCQExams,
+  OMRSubmissions,
+  MCQStudentAnswers,
+  MCQResults,
+} from "../db/schema.js";
 
 // ======================================
 // CHECK MANUAL OMR
@@ -160,6 +166,57 @@ export const checkManualOMR = async (req, res) => {
       "OMR Submission Saved:",
       submission[0]
     );
+
+
+const answerRow=result.details.map((detail)=>({
+submissionId:submission[0].id,
+selectedAnswer: detail.studentAnswer||null,
+questionId: detail.questionId,
+isCorrect:detail.status === "unanswer"? null :detail.isCorrect,
+
+marksObtained:detail.isCorrect ? 1 : 0,
+
+
+}))
+
+if(answerRow.length > 0){
+
+await db.insert(MCQStudentAnswers).values(answerRow)
+}
+console.log(
+  "Student Answers Saved:",
+  answerRow.length
+);
+
+const totalMarks=result.totalQuestions;
+const obtainedMarks=result.marks
+
+const percentage=totalMarks>0?Math.round((obtainedMarks/totalMarks)*100):0
+
+
+const saveResult=await db.insert(MCQResults).values({
+examId:exam.id,
+studentId:foundStudent.id,
+submissionId:submission[0].id,
+totalQuestions:result.totalQuestions,
+correctAnswers:result.correct,
+wrongAnswers:result.wrong,
+skippedAnswers:result.unanswered,
+totalMarks,
+obtainedMarks,
+percentage
+
+
+
+
+
+
+
+
+
+})
+
+
 
     // ================================
     // RESPONSE
