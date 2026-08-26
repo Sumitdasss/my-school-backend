@@ -705,3 +705,37 @@ export const MCQResults = pgTable(
     ),
   })
 );
+
+export const admissions = pgTable("admissions", {
+  id: serial("id").primaryKey(),
+
+  fullName: varchar("full_name", { length: 150 }).notNull(),
+
+  fatherName: varchar("father_name", { length: 150 }).notNull(),
+
+  motherName: varchar("mother_name", { length: 150 }).notNull(),
+
+  dateOfBirth: date("date_of_birth").notNull(),
+
+  class: varchar("class", { length: 20 }).notNull(),
+
+  phone: varchar("phone", { length: 20 }).notNull(),
+
+  email: varchar("email", { length: 150 }).notNull(),
+
+  address: text("address"),
+
+  studentImage: text("student_image"),
+
+  status: varchar("status", { length: 30 })
+    .notNull()
+    .default("pending"),
+
+  createdAt: timestamp("created_at")
+    .defaultNow()
+    .notNull(),
+
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .notNull(),
+});

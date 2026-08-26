@@ -39,6 +39,7 @@ deleteStudent1122
 } from "../controler/Studentloging.js";
 import {adminLogin} from "../controler/adminController.js"
 import {resetPassword,verifyOTP,sendOTP} from "../controler/passwordController.js"
+import {Creatapplystudent,getapplystudent,updateAdmissionStatus} from "../controler/Onlineapply.js"
 const router = express.Router();
 import upload from "../middleware/upload.js";
 
@@ -81,5 +82,8 @@ router.post("/admin",adminLogin)
 router.post("/cheak",studentAuth, checkManualOMR)
 router.get("/getmcqresult",getAllMCQResults)
 router.delete("/deletmcqresult/:id",deleteMCQResult)
+router.post("/apply", upload.single("studentImage"), Creatapplystudent)
+router.get("/applystudent", getapplystudent)
+router.patch("/updet/:id/status",updateAdmissionStatus)
 
 export default router;
