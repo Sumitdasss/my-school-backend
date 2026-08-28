@@ -188,3 +188,42 @@ export const updateAdmissionStatus = async (req, res) => {
     });
   }
 };
+
+export const DELETapplystudent = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id || isNaN(Number(id))) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid student ID",
+      });
+    }
+
+    const deletedStudent = await db
+      .delete(admissions)
+      .where(eq(admissions.id, Number(id)))
+      .returning();
+
+    if (deletedStudent.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Student deleted successfully",
+      data: deletedStudent[0],
+    });
+  } catch (error) {
+    console.error("Delete student error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
