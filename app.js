@@ -53,6 +53,16 @@ app.use("/api/addmition", studentRoute);
 
 
 app.use("/api/auth", authRoute);
+app.use((req, res, next) => {
+  const error = new Error( `Route not found: ${req.method} ${req.originalUrl}`);
+  error.status = 404;
+  next(error);
 
+})
+
+app.use((err,req,res,next)=>{
+  const statusCode  = err.status ||err.statusCode|| 500;
+  res.status(statusCode).json({ message: err.message||"Internal Server Error",success:false });
+});
 
 export default app;
