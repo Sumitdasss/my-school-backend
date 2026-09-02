@@ -1,11 +1,7 @@
 import { jwtVerify } from "jose";
 
 export const adminAuth = async (req, res, next) => {
-  console.log("=================================");
-  console.log("🔐 Admin Auth Middleware");
-  console.log("METHOD:", req.method);
-  console.log("URL:", req.originalUrl);
-  console.log("=================================");
+
 
   try {
     // Authorization Header
@@ -40,7 +36,7 @@ export const adminAuth = async (req, res, next) => {
       return next(error);
     }
 
-    console.log("🎫 Token পাওয়া গেছে");
+
 
     // JWT Secret check
     if (!process.env.JWT_SECRET) {
@@ -53,8 +49,7 @@ export const adminAuth = async (req, res, next) => {
 
     // JWT Verify
 
-console.log("VERIFY JWT SECRET EXISTS:", !!process.env.JWT_SECRET);
-console.log("VERIFY JWT SECRET LENGTH:", process.env.JWT_SECRET?.length);
+
     const { payload } = await jwtVerify(
       token,
       secret,
@@ -63,8 +58,7 @@ console.log("VERIFY JWT SECRET LENGTH:", process.env.JWT_SECRET?.length);
       }
     );
 
-    console.log("✅ JWT Verified");
-    console.log("👤 Admin Payload:", payload);
+
 
     // Role check
     if (
@@ -88,13 +82,8 @@ console.log("VERIFY JWT SECRET LENGTH:", process.env.JWT_SECRET?.length);
     // Admin data request-এ রাখা
     req.admin = payload;
 
-    console.log(
-      "👑 Admin Authorized Successfully"
-    );
-
-    console.log(
-      "➡️ Next Controller-এ যাচ্ছে"
-    );
+   
+   
 
     next();
 
