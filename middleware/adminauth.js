@@ -53,7 +53,8 @@ export const adminAuth = async (req, res, next) => {
 
     // JWT Verify
 
-
+console.log("VERIFY JWT SECRET EXISTS:", !!process.env.JWT_SECRET);
+console.log("VERIFY JWT SECRET LENGTH:", process.env.JWT_SECRET?.length);
     const { payload } = await jwtVerify(
       token,
       secret,

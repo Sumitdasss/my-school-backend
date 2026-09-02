@@ -65,12 +65,8 @@ export const adminLogin = async (req, res, next) => {
     );
 
     // JWT তৈরি
-  console.log("========== LOGIN CONTROLLER ==========");
-    console.log(
-      "LOGIN JWT_SECRET EXISTS:",
-      !!process.env.JWT_SECRET
-    );
-    console.log("LOGIN USER:", username);
+ console.log("LOGIN JWT SECRET EXISTS:", !!process.env.JWT_SECRET);
+console.log("LOGIN JWT SECRET LENGTH:", process.env.JWT_SECRET?.length);
     const token = await new SignJWT({
       id: admin.id,
       username: admin.username,
