@@ -46,6 +46,7 @@ import upload from "../middleware/upload.js";
 import { checkManualOMR } from "../controler/omrController.js";
 import { studentAuth } from "../middleware/studentAuth.js";
 import { getAllMCQResults,deleteMCQResult } from "../controler/mcqResultController.js";
+import { adminAuth } from "../middleware/adminauth.js";
 router.post("/register", upload.single("photo"), studentRegister);
 router.post("/Parentregister123", upload.single("photo"), ParentRegister);
 router.post("/Teacherregister123", upload.single("photo"), TeacherRegister);
@@ -86,5 +87,17 @@ router.post("/apply", upload.single("studentImage"), Creatapplystudent)
 router.get("/applystudent", getapplystudent)
 router.patch("/updet/:id/status",updateAdmissionStatus)
 router.delete("/DELETapplystudent/:id",DELETapplystudent)
+router.get(
+  "/admin-test",
+  adminAuth,
+  (req, res) => {
+    console.log("🎯 Admin Controller চলছে");
 
+    res.json({
+      success: true,
+      message: "Admin access successful",
+      admin: req.admin,
+    });
+  }
+);
 export default router;

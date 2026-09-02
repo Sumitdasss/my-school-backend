@@ -5,24 +5,22 @@ import { eq } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { Admin } from "../db/schema.js";
 
-
-// ===============================
-// ADMIN LOGIN
-// ===============================
-
-export const adminLogin = async (req, res) => {
+export const adminLogin = async (req, res, next) => {
   try {
-
     const { username, password } = req.body;
 
+    // Validation
     if (!username || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Username and password are required",
-      });
+      const error = new Error(
+        "Username and password are required"
+      );
+
+      error.statusCode = 400;
+
+      return next(error);
     }
 
-    // Find Admin
+    // Admin খোঁজা
     const result = await db
       .select()
       .from(Admin)
@@ -32,26 +30,41 @@ export const adminLogin = async (req, res) => {
     const admin = result[0];
 
     if (!admin) {
-      return res.status(401).json({
-        success: false,
-        message: "Wrong username or password",
-      });
+      const error = new Error(
+        "Wrong username or password"
+      );
+
+      error.statusCode = 401;
+
+      return next(error);
     }
 
-    // Password check
+    // Password verify
     const isMatch = await bcrypt.compare(
       password,
       admin.password
     );
 
     if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: "Wrong username or password",
-      });
+      const error = new Error(
+        "Wrong username or password"
+      );
+
+      error.statusCode = 401;
+
+      return next(error);
     }
 
-    // JWT
+    // JWT Secret check
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is missing");
+    }
+
+    const secret = new TextEncoder().encode(
+      process.env.JWT_SECRET
+    );
+
+    // JWT তৈরি
     const token = await new SignJWT({
       id: admin.id,
       username: admin.username,
@@ -60,15 +73,20 @@ export const adminLogin = async (req, res) => {
       .setProtectedHeader({
         alg: "HS256",
       })
+      .setIssuedAt()
       .setExpirationTime("2h")
-      .sign(
-        new TextEncoder().encode(
-          process.env.JWT_SECRET
-        )
-      );
+      .sign(secret);
+
+    console.log("✅ Admin Login Successful");
+    console.log("👤 Role:", admin.role);
+    console.log(
+      "🔑 JWT_SECRET exists:",
+      !!process.env.JWT_SECRET
+    );
 
     return res.status(200).json({
       success: true,
+      message: "Login Successful",
       token,
 
       admin: {
@@ -81,12 +99,6 @@ export const adminLogin = async (req, res) => {
     });
 
   } catch (error) {
-
-    console.error("Admin Login Error:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Server Error",
-    });
+    next(error);
   }
 };

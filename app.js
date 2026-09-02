@@ -32,6 +32,7 @@ app.use(express.json());
 
 import authRoute from "./routes/auth.js";
 import studentRoute from "./routes/Allrouts.js";
+import { adminAuth } from "./middleware/adminauth.js";
 
 app.use("/api/student", studentRoute);
 app.use("/api/ParentRegistar", studentRoute);
@@ -46,7 +47,8 @@ app.use("/api/ALLMCQEXAM", studentRoute);
 app.use("/api/mcq-questions", studentRoute);
 app.use("/api/studentlogin", studentRoute);
 app.use("/api/chagepassword", studentRoute);
-app.use("/api/adminlogin", studentRoute);
+app.use("/api/adminlogin",studentRoute);
+app.use("/api/admintest",studentRoute);
 app.use("/api/omr", studentRoute);
 app.use("/api/MCQresult", studentRoute);
 app.use("/api/addmition", studentRoute);
