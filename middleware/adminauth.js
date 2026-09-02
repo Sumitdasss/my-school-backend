@@ -52,6 +52,8 @@ export const adminAuth = async (req, res, next) => {
     );
 
     // JWT Verify
+
+
     const { payload } = await jwtVerify(
       token,
       secret,
