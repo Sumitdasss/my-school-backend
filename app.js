@@ -50,9 +50,10 @@ app.use("/api/adminlogin", studentRoute);
 app.use("/api/omr", studentRoute);
 app.use("/api/MCQresult", studentRoute);
 app.use("/api/addmition", studentRoute);
-
-
 app.use("/api/auth", authRoute);
+
+
+
 app.use((req, res, next) => {
   const error = new Error( `Route not found: ${req.method} ${req.originalUrl}`);
   error.status = 404;
