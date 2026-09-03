@@ -52,6 +52,7 @@ app.use("/api/admintest",studentRoute);
 app.use("/api/omr", studentRoute);
 app.use("/api/MCQresult", studentRoute);
 app.use("/api/addmition", studentRoute);
+app.use("/api/addnotice", studentRoute);
 app.use("/api/auth", authRoute);
 
 
