@@ -38,12 +38,14 @@ export const Parent = pgTable("Parent", {
   phone: varchar("phone", { length: 20 })
     .notNull()
     .unique(),
-childEmail: varchar("child_email", { length: 255 }).notNull(),
-  childName: varchar("child_name", { length: 255 }).notNull(),
 
-  childClass: varchar("child_class", { length: 50 }).notNull(),
+  childEmail: varchar("child_email", { length: 255 }),
 
-  childRoll: varchar("child_roll", { length: 50 }).notNull(),
+  childName: varchar("child_name", { length: 255 }),
+
+  childClass: varchar("child_class", { length: 50 }),
+
+  childRoll: varchar("child_roll", { length: 50 }),
 
   password: varchar("password", { length: 255 }).notNull(),
 
