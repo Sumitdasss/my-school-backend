@@ -52,6 +52,7 @@ import { getStudentProfile } from "../controler/authController.js";
 import { deleteParent, getAllParents, getParentProfile } from "../controler/Parentlogin.js";
 import { deleteTeacher, getAllTeachers, getTeacherProfile } from "../controler/Teacherlogin.js";
 import { addChild,getMyStudents, removeChild } from "../controler/addChild.js";
+import { getParentAttendance } from "../controler/attendance.js";
 router.post("/register", upload.single("photo"), studentRegister);
 router.post("/Parentregister123", upload.single("photo"), ParentRegister);
 router.post("/Teacherregister123", upload.single("photo"), TeacherRegister);
@@ -124,6 +125,7 @@ router.get("/all-teachers", getAllTeachers);
 router.delete("/all-teachers/:id", deleteTeacher);
 router.delete("/all-parents/:id", deleteParent);
 router.get("/all-parents", getAllParents);
+router.get("/getParentAttendance",parentAuth, getParentAttendance);
 
 
 
