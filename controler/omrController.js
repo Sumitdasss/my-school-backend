@@ -17,7 +17,16 @@ import {
 // ======================================
 
 export const checkManualOMR = async (req, res) => {
+
   try {
+ const studenttId = Number(req.studentId);
+  if (!studenttId) {
+      return res.status(401).json({
+        success: false,
+        message: "Student authentication required.",
+      });
+    }
+
     const {
       examCode,
       setName,
