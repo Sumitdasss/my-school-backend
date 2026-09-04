@@ -241,7 +241,7 @@ export const Notices = pgTable("notices", {
 
   description: text("description"),
 
-  attachment: varchar("attachment", { length: 500 }),
+  attachment: text("attachment"),
 
   createdAt: timestamp("created_at").defaultNow(),
 });
