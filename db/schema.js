@@ -3,11 +3,11 @@ import {
   serial,
   varchar,
   text,
-    integer,
+  integer,
   timestamp,
   boolean,
-  unique ,
-  date
+  unique,
+  date,
 } from "drizzle-orm/pg-core";
 
 export const Teacher = pgTable("Teacher", {
@@ -31,13 +31,9 @@ export const Parent = pgTable("Parent", {
 
   fullName: varchar("full_name", { length: 255 }).notNull(),
 
-  email: varchar("email", { length: 255 })
-    .notNull()
-    .unique(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
 
-  phone: varchar("phone", { length: 20 })
-    .notNull()
-    .unique(),
+  phone: varchar("phone", { length: 20 }).notNull().unique(),
 
   childEmail: varchar("child_email", { length: 255 }),
 
@@ -51,16 +47,12 @@ export const Parent = pgTable("Parent", {
 
   photo: varchar("photo", { length: 500 }),
 
-  createdAt: timestamp("created_at")
-    .defaultNow()
-    .notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-
 
 // Student Table
 
 export const Students = pgTable("Students", {
-
   id: serial("id").primaryKey(),
 
   fullName: varchar("full_name", {
@@ -75,9 +67,7 @@ export const Students = pgTable("Students", {
     length: 255,
   }).notNull(),
 
-  dateOfBirth: timestamp(
-    "date_of_birth"
-  ).notNull(),
+  dateOfBirth: timestamp("date_of_birth").notNull(),
 
   phone: varchar("phone", {
     length: 20,
@@ -98,14 +88,10 @@ export const Students = pgTable("Students", {
     .unique(),
 
   // Parent delete হলে automatically NULL হবে
-  parentId: integer("parent_id")
-    .references(
-      () => Parent.id,
-      {
-        onDelete: "set null",
-        onUpdate: "cascade",
-      }
-    ),
+  parentId: integer("parent_id").references(() => Parent.id, {
+    onDelete: "set null",
+    onUpdate: "cascade",
+  }),
 
   password: varchar("password", {
     length: 255,
@@ -123,16 +109,10 @@ export const Students = pgTable("Students", {
     length: 10,
   }).notNull(),
 
-  createdAt: timestamp("created_at")
-    .defaultNow()
-    .notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .notNull(),
-
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
-
 
 export const Admin = pgTable("admins", {
   id: serial("id").primaryKey(),
@@ -155,42 +135,26 @@ export const LoginHistory = pgTable("LoginHistory", {
 export const ParentLoginHistory = pgTable("ParentLoginHistory", {
   id: serial("id").primaryKey(),
 
-  ParentId: integer("Parent_id")
-    .references(() => Parent.id, {
-      onDelete: "set null",
-      onUpdate: "cascade",
-    }),
+  ParentId: integer("Parent_id").references(() => Parent.id, {
+    onDelete: "set null",
+    onUpdate: "cascade",
+  }),
 
-  loginAt: timestamp("login_at")
-    .defaultNow()
-    .notNull(),
+  loginAt: timestamp("login_at").defaultNow().notNull(),
 });
-export const TeacherLoginHistory = pgTable(
-  "TeacherLoginHistory",
-  {
-
-    id: serial("id").primaryKey(),
-
-    TeacherId: integer("Teacher_id")
-      .notNull()
-      .references(() => Teacher.id, {
-        onDelete: "set null",
-        onUpdate: "cascade",
-      }),
-
-    loginAt: timestamp("login_at")
-      .defaultNow()
-      .notNull(),
-
-  }
-);
+export const TeacherLoginHistory = pgTable("TeacherLoginHistory", {
+  id: serial("id").primaryKey(),
+  TeacherId: integer("Teacher_id")
+    .notNull()
+    .references(() => Teacher.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  loginAt: timestamp("login_at").defaultNow().notNull(),
+});
 
 export const Subjects = pgTable("Subjects", {
   id: serial("id").primaryKey(),
   subjectName: varchar("subjectname", { length: 100 }).notNull(),
   class1: varchar("class", { length: 20 }).notNull(),
 });
-
 
 export const TeacherAssignments = pgTable("TeacherAssignments", {
   id: serial("id").primaryKey(),
@@ -204,7 +168,6 @@ export const TeacherAssignments = pgTable("TeacherAssignments", {
   section: varchar("section", { length: 10 }).notNull(),
 });
 
-
 export const Exams = pgTable("Exams", {
   id: serial("id").primaryKey(),
   examName: varchar("exam_name", { length: 50 }).notNull(),
@@ -214,36 +177,28 @@ export const Exams = pgTable("Exams", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-
 export const Results = pgTable(
-"Results",
-{
- id: serial("id").primaryKey(),
+  "Results",
+  {
+    id: serial("id").primaryKey(),
 
- studentId: integer("student_id").notNull(),
+    studentId: integer("student_id").notNull(),
 
- examId: integer("exam_id").notNull(),
+    examId: integer("exam_id").notNull(),
 
- subjectId: integer("subject_id").notNull(),
+    subjectId: integer("subject_id").notNull(),
 
- teacherId: integer("teacher_id"),
+    teacherId: integer("teacher_id"),
 
- marksObtained: integer("marks_obtained").notNull(),
+    marksObtained: integer("marks_obtained").notNull(),
 
- totalMarks: integer("total_marks").notNull(),
+    totalMarks: integer("total_marks").notNull(),
 
- createdAt: timestamp("created_at")
- .defaultNow(),
-
-},
-(table)=>({
- uniqueResult: unique()
- .on(
-   table.studentId,
-   table.examId,
-   table.subjectId
- )
-})
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => ({
+    uniqueResult: unique().on(table.studentId, table.examId, table.subjectId),
+  }),
 );
 
 export const Attendance = pgTable(
@@ -264,9 +219,9 @@ export const Attendance = pgTable(
   (table) => ({
     uniqueAttendance: unique("unique_student_attendance").on(
       table.studentId,
-      table.attendanceDate
+      table.attendanceDate,
     ),
-  })
+  }),
 );
 
 export const Notices = pgTable("notices", {
@@ -290,9 +245,6 @@ export const Notices = pgTable("notices", {
 
   createdAt: timestamp("created_at").defaultNow(),
 });
-
-
-
 
 // =============================
 // Routine Header
@@ -363,7 +315,9 @@ export const Payments = pgTable("Payments", {
 
   feeType: varchar("fee_type", { length: 100 }).notNull(),
 
-  paymentMethod: varchar("payment_method", { length: 50 }).default("SSLCommerz"),
+  paymentMethod: varchar("payment_method", { length: 50 }).default(
+    "SSLCommerz",
+  ),
 
   transactionId: varchar("transaction_id", { length: 255 }).unique(),
 
@@ -387,7 +341,6 @@ export const PaymentItems = pgTable("PaymentItems", {
 });
 
 export const Fees = pgTable("Fees", {
-
   id: serial("id").primaryKey(),
 
   class1: varchar("class", { length: 20 }).notNull(),
@@ -401,7 +354,6 @@ export const Fees = pgTable("Fees", {
   isActive: boolean("is_active").default(true),
 
   createdAt: timestamp("created_at").defaultNow(),
-
 });
 export const AdmitCards = pgTable("AdmitCards", {
   id: serial("id").primaryKey(),
@@ -429,9 +381,6 @@ export const AdmitCards = pgTable("AdmitCards", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-
-
-
 // ======================================================
 // MCQ EXAMS
 // ======================================================
@@ -440,7 +389,9 @@ export const MCQExams = pgTable("mcq_exams", {
 
   examCode: varchar("exam_code", {
     length: 50,
-  }).notNull().unique(),
+  })
+    .notNull()
+    .unique(),
 
   examName: varchar("exam_name", {
     length: 255,
@@ -464,17 +415,11 @@ export const MCQExams = pgTable("mcq_exams", {
 
   examDate: date("exam_date"),
 
-  isActive: boolean("is_active")
-    .default(true)
-    .notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
 
-  createdAt: timestamp("created_at")
-    .defaultNow()
-    .notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // ======================================================
@@ -515,7 +460,9 @@ export const OMRSubmissions = pgTable("omr_submissions", {
   // কখন submit করেছে
   submittedAt: timestamp("submitted_at", {
     withTimezone: true,
-  }).defaultNow().notNull(),
+  })
+    .defaultNow()
+    .notNull(),
 });
 export const MCQQuestions = pgTable("mcq_questions", {
   id: serial("id").primaryKey(),
@@ -528,43 +475,32 @@ export const MCQQuestions = pgTable("mcq_questions", {
 
   setName: varchar("set_name", {
     length: 10,
-  }).notNull().default("A"),
+  })
+    .notNull()
+    .default("A"),
 
-  questionNumber: integer("question_number")
-    .notNull(),
+  questionNumber: integer("question_number").notNull(),
 
-  question: text("question")
-    .notNull(),
+  question: text("question").notNull(),
 
-  optionA: text("option_a")
-    .notNull(),
+  optionA: text("option_a").notNull(),
 
-  optionB: text("option_b")
-    .notNull(),
+  optionB: text("option_b").notNull(),
 
-  optionC: text("option_c")
-    .notNull(),
+  optionC: text("option_c").notNull(),
 
-  optionD: text("option_d")
-    .notNull(),
+  optionD: text("option_d").notNull(),
 
   correctAnswer: varchar("correct_answer", {
     length: 1,
   }).notNull(),
 
-  marks: integer("marks")
-    .default(1)
-    .notNull(),
+  marks: integer("marks").default(1).notNull(),
 
-  createdAt: timestamp("created_at")
-    .defaultNow()
-    .notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
-
 
 // ======================================================
 // MCQ ANSWER SHEETS
@@ -599,13 +535,10 @@ export const MCQAnswerSheets = pgTable("mcq_answer_sheets", {
   // completed
   // failed
 
-  uploadedAt: timestamp("uploaded_at")
-    .defaultNow()
-    .notNull(),
+  uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
 
   processedAt: timestamp("processed_at"),
 });
-
 
 // ======================================================
 // MCQ STUDENT ANSWERS
@@ -643,33 +576,23 @@ export const MCQStudentAnswers = pgTable(
 
     isCorrect: boolean("is_correct"),
 
-    marksObtained: integer("marks_obtained")
-      .default(0)
-      .notNull(),
+    marksObtained: integer("marks_obtained").default(0).notNull(),
 
-    detectionConfidence: integer(
-      "detection_confidence"
-    ),
+    detectionConfidence: integer("detection_confidence"),
 
-    isManuallyCorrected: boolean(
-      "is_manually_corrected"
-    )
+    isManuallyCorrected: boolean("is_manually_corrected")
       .default(false)
       .notNull(),
 
-    createdAt: timestamp("created_at")
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
   },
 
   (table) => ({
-    answerUnique: unique(
-      "mcq_student_answer_unique"
-    ).on(
+    answerUnique: unique("mcq_student_answer_unique").on(
       table.submissionId,
-      table.questionId
+      table.questionId,
     ),
-  })
+  }),
 );
 // ======================================================
 // MCQ RESULTS
@@ -702,52 +625,38 @@ export const MCQResults = pgTable(
       }),
 
     // যদি পুরোনো AnswerSheet system থাকে
-    answerSheetId: integer("answer_sheet_id")
-      .references(() => MCQAnswerSheets.id, {
+    answerSheetId: integer("answer_sheet_id").references(
+      () => MCQAnswerSheets.id,
+      {
         onDelete: "set null",
-      }),
+      },
+    ),
 
-    totalQuestions: integer("total_questions")
-      .notNull(),
+    totalQuestions: integer("total_questions").notNull(),
 
-    correctAnswers: integer("correct_answers")
-      .default(0)
-      .notNull(),
+    correctAnswers: integer("correct_answers").default(0).notNull(),
 
-    wrongAnswers: integer("wrong_answers")
-      .default(0)
-      .notNull(),
+    wrongAnswers: integer("wrong_answers").default(0).notNull(),
 
-    skippedAnswers: integer("skipped_answers")
-      .default(0)
-      .notNull(),
+    skippedAnswers: integer("skipped_answers").default(0).notNull(),
 
-    totalMarks: integer("total_marks")
-      .notNull(),
+    totalMarks: integer("total_marks").notNull(),
 
-    obtainedMarks: integer("obtained_marks")
-      .default(0)
-      .notNull(),
+    obtainedMarks: integer("obtained_marks").default(0).notNull(),
 
     percentage: integer("percentage"),
 
-    createdAt: timestamp("created_at")
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
 
-    updatedAt: timestamp("updated_at")
-      .defaultNow()
-      .notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
 
   (table) => ({
-    studentExamUnique: unique(
-      "mcq_student_exam_unique"
-    ).on(
+    studentExamUnique: unique("mcq_student_exam_unique").on(
       table.examId,
-      table.studentId
+      table.studentId,
     ),
-  })
+  }),
 );
 
 export const admissions = pgTable("admissions", {
@@ -771,15 +680,9 @@ export const admissions = pgTable("admissions", {
 
   studentImage: text("student_image"),
 
-  status: varchar("status", { length: 30 })
-    .notNull()
-    .default("pending"),
+  status: varchar("status", { length: 30 }).notNull().default("pending"),
 
-  createdAt: timestamp("created_at")
-    .defaultNow()
-    .notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
