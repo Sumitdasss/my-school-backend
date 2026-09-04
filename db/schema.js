@@ -58,40 +58,70 @@ export const Parent = pgTable("Parent", {
 
 
 // Student Table
+
 export const Students = pgTable("Students", {
 
   id: serial("id").primaryKey(),
 
-  fullName: varchar("full_name", { length: 255 }).notNull(),
+  fullName: varchar("full_name", {
+    length: 255,
+  }).notNull(),
 
-  fatherName: varchar("father_name", { length: 255 }).notNull(),
+  fatherName: varchar("father_name", {
+    length: 255,
+  }).notNull(),
 
-  motherName: varchar("mother_name", { length: 255 }).notNull(),
+  motherName: varchar("mother_name", {
+    length: 255,
+  }).notNull(),
 
-  dateOfBirth: timestamp("date_of_birth").notNull(),
+  dateOfBirth: timestamp(
+    "date_of_birth"
+  ).notNull(),
 
-  phone: varchar("phone", { length: 20 })
+  phone: varchar("phone", {
+    length: 20,
+  })
     .notNull()
     .unique(),
 
-    rollNumber: varchar("roll_number", { length: 50 })
-  .notNull()
-  .unique(),
-
-  email: varchar("email", { length: 255 })
+  rollNumber: varchar("roll_number", {
+    length: 50,
+  })
     .notNull()
     .unique(),
-parentId: integer("parent_id")
-  .references(() => Parent.id),
-  password: varchar("password", { length: 255 })
-    .notNull(),
 
-  photo: varchar("photo", { length: 500 }),
+  email: varchar("email", {
+    length: 255,
+  })
+    .notNull()
+    .unique(),
 
+  // Parent delete হলে automatically NULL হবে
+  parentId: integer("parent_id")
+    .references(
+      () => Parent.id,
+      {
+        onDelete: "set null",
+        onUpdate: "cascade",
+      }
+    ),
 
-   class1: varchar("class", { length: 20 }).notNull(),      
-  section: varchar("section", { length: 10 }).notNull(),
+  password: varchar("password", {
+    length: 255,
+  }).notNull(),
 
+  photo: varchar("photo", {
+    length: 500,
+  }),
+
+  class1: varchar("class", {
+    length: 20,
+  }).notNull(),
+
+  section: varchar("section", {
+    length: 10,
+  }).notNull(),
 
   createdAt: timestamp("created_at")
     .defaultNow()
@@ -102,6 +132,8 @@ parentId: integer("parent_id")
     .notNull(),
 
 });
+
+
 export const Admin = pgTable("admins", {
   id: serial("id").primaryKey(),
   username: varchar("username", { length: 255 }).notNull(),
@@ -124,8 +156,10 @@ export const ParentLoginHistory = pgTable("ParentLoginHistory", {
   id: serial("id").primaryKey(),
 
   ParentId: integer("Parent_id")
-    .notNull()
-    .references(() => Parent.id),
+    .references(() => Parent.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
 
   loginAt: timestamp("login_at")
     .defaultNow()
