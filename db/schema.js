@@ -165,17 +165,25 @@ export const ParentLoginHistory = pgTable("ParentLoginHistory", {
     .defaultNow()
     .notNull(),
 });
-export const TeacherLoginHistory = pgTable("TeacherLoginHistory", {
-  id: serial("id").primaryKey(),
+export const TeacherLoginHistory = pgTable(
+  "TeacherLoginHistory",
+  {
 
-  TeacherId: integer("Teacher_id")
-    .notNull()
-    .references(() => Teacher.id),
+    id: serial("id").primaryKey(),
 
-  loginAt: timestamp("login_at")
-    .defaultNow()
-    .notNull(),
-});
+    TeacherId: integer("Teacher_id")
+      .notNull()
+      .references(() => Teacher.id, {
+        onDelete: "set null",
+        onUpdate: "cascade",
+      }),
+
+    loginAt: timestamp("login_at")
+      .defaultNow()
+      .notNull(),
+
+  }
+);
 
 export const Subjects = pgTable("Subjects", {
   id: serial("id").primaryKey(),
