@@ -68,3 +68,69 @@ export const studentLogin = async (req, res) => {
     });
   }
 };
+export const getStudentProfile = async (
+  req,
+  res
+) => {
+
+  try {
+
+    // Token থেকে ID
+    const studentId =
+      Number(req.studentId);
+
+
+    const student = await db
+      .select()
+      .from(Students)
+      .where(
+        eq(
+          Students.id,
+          studentId
+        )
+      )
+      .limit(1);
+
+
+    if (student.length === 0) {
+
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+
+    }
+
+
+    // Password remove
+    const {
+      password,
+      ...safeStudent
+    } = student[0];
+
+
+    return res.status(200).json({
+
+      success: true,
+
+      data: safeStudent,
+
+    });
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    return res.status(500).json({
+
+      success: false,
+
+      message:
+        "Failed to get student profile",
+
+    });
+
+  }
+
+};

@@ -32,6 +32,7 @@ if(teachers.length===0){return res.status(200).json( { message: "Student not fou
           {
             id: teacher.id,
             email: teacher.email,
+              role: "teacher",
           },
           process.env.JWT_SECRET,
           {
@@ -51,7 +52,7 @@ emitter.emit("Teacher Login",teacher)
 
     }catch(err){
          console.log(err.cause);
-         return Response.json(
+         return res.status(500).json(
     {
       error: error.message,
       cause: error.cause?.message,
@@ -63,3 +64,40 @@ emitter.emit("Teacher Login",teacher)
     }
 
 }
+
+export const getTeacherProfile = async (req, res) => {
+  try {
+
+    const teacherId = req.teacherId;
+
+    const teacher = await db
+      .select()
+      .from(Teacher)
+      .where(eq(Teacher.id, teacherId))
+      .limit(1);
+
+    if (teacher.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Teacher not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: teacher[0],
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Get Teacher Profile Error:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to get teacher profile",
+    });
+  }
+};

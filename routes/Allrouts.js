@@ -44,10 +44,13 @@ const router = express.Router();
 import upload from "../middleware/upload.js";
 
 import { checkManualOMR } from "../controler/omrController.js";
-import { studentAuth } from "../middleware/studentAuth.js";
+import {studentAuth22, studentAuth, parentAuth, teacherAuth } from "../middleware/studentAuth.js";
 import { getAllMCQResults,deleteMCQResult } from "../controler/mcqResultController.js";
 import { adminAuth } from "../middleware/adminauth.js";
 import { addNotice, getNotices } from "../controler/NoticeControler.js";
+import { getStudentProfile } from "../controler/authController.js";
+import { getParentProfile } from "../controler/Parentlogin.js";
+import { getTeacherProfile } from "../controler/Teacherlogin.js";
 router.post("/register", upload.single("photo"), studentRegister);
 router.post("/Parentregister123", upload.single("photo"), ParentRegister);
 router.post("/Teacherregister123", upload.single("photo"), TeacherRegister);
@@ -90,6 +93,18 @@ router.patch("/updet/:id/status",updateAdmissionStatus)
 router.delete("/DELETapplystudent/:id",DELETapplystudent)
 router.post("/notice11", upload.single("file"), addNotice);
 router.get("/allnotice", getNotices);
+router.get("/profile",studentAuth22, getStudentProfile);
+router.get(
+  "/parentprofile",
+  parentAuth,
+  getParentProfile
+);
+router.get(
+  "/teacherprofile",
+  teacherAuth,
+  getTeacherProfile
+);
+
 
 
 
