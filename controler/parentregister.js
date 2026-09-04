@@ -49,8 +49,6 @@ console.log(req.body);
     // Roll Check
 
 
-
-
     // Password Hash
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -58,7 +56,10 @@ console.log(req.body);
     // Insert Student
    const Prent = {
   fullName,
-
+childName:null,
+childClass:null,
+childRoll:null,
+childEmail:null,
 phone,
 email,
 password: hashedPassword,
