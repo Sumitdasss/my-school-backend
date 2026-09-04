@@ -244,3 +244,67 @@ export const getParentProfile = async (
   }
 
 };
+
+export async function getAllParents(req, res) {
+  try {
+    const parents = await db
+      .select()
+      .from(Parent);
+
+    return res.status(200).json({
+      success: true,
+      count: parents.length,
+      data: parents,
+    });
+
+  } catch (error) {
+    console.error("GET ALL PARENTS ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+}
+
+export async function deleteParent(req, res) {
+  try {
+    const { id } = req.params;
+
+    const parentId = Number(id);
+
+    console.log("DELETE PARENT ID:", parentId);
+
+    if (!Number.isInteger(parentId) || parentId <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid Parent ID",
+      });
+    }
+
+    const deleted = await db
+      .delete(Parent)
+      .where(eq(Parent.id, parentId))
+      .returning();
+
+    if (!deleted.length) {
+      return res.status(404).json({
+        success: false,
+        error: "Parent not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Parent deleted successfully",
+    });
+
+  } catch (error) {
+    console.error("DELETE PARENT ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+}

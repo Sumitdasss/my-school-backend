@@ -100,4 +100,67 @@ export const getTeacherProfile = async (req, res) => {
       message: "Failed to get teacher profile",
     });
   }
+}
+
+export const getAllTeachers = async (req, res) => {
+  try {
+    const teachers = await db
+      .select()
+      .from(Teacher);
+
+    return res.status(200).json({
+      success: true,
+      count: teachers.length,
+      data: teachers,
+    });
+
+  } catch (error) {
+    console.error("Get All Teachers Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to get teachers",
+    });
+  }
 };
+export async function deleteTeacher(req, res) {
+  try {
+    const { id } = req.params;
+
+    const teacherId = Number(id);
+
+    console.log("DELETE TEACHER ID:", teacherId);
+
+    if (!Number.isInteger(teacherId) || teacherId <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid Teacher ID",
+      });
+    }
+
+    const deleted = await db
+      .delete(Teacher)
+      .where(eq(Teacher.id, teacherId))
+      .returning();
+
+    if (!deleted.length) {
+      return res.status(404).json({
+        success: false,
+        error: "Teacher not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Teacher deleted successfully",
+    });
+
+  } catch (error) {
+    console.error("DELETE TEACHER ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+}

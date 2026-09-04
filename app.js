@@ -32,11 +32,12 @@ app.use(express.json());
 
 import authRoute from "./routes/auth.js";
 import studentRoute from "./routes/Allrouts.js";
-import { adminAuth } from "./middleware/adminauth.js";
+
 
 app.use("/api/student", studentRoute);
 app.use("/api/ParentRegistar", studentRoute);
 app.use("/api/TeacherRegistar", studentRoute);
+app.use("/api/Teacher", studentRoute);
 app.use("/api", studentRoute);
 app.use("/api/subject", studentRoute);
 app.use("/api/Result", studentRoute);

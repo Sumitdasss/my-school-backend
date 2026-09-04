@@ -49,8 +49,8 @@ import { getAllMCQResults,deleteMCQResult } from "../controler/mcqResultControll
 import { adminAuth } from "../middleware/adminauth.js";
 import { addNotice, getNotices } from "../controler/NoticeControler.js";
 import { getStudentProfile } from "../controler/authController.js";
-import { getParentProfile } from "../controler/Parentlogin.js";
-import { getTeacherProfile } from "../controler/Teacherlogin.js";
+import { deleteParent, getAllParents, getParentProfile } from "../controler/Parentlogin.js";
+import { deleteTeacher, getAllTeachers, getTeacherProfile } from "../controler/Teacherlogin.js";
 router.post("/register", upload.single("photo"), studentRegister);
 router.post("/Parentregister123", upload.single("photo"), ParentRegister);
 router.post("/Teacherregister123", upload.single("photo"), TeacherRegister);
@@ -104,7 +104,10 @@ router.get(
   teacherAuth,
   getTeacherProfile
 );
-
+router.get("/all-teachers", getAllTeachers);
+router.delete("/all-teachers/:id", deleteTeacher);
+router.delete("/all-parents/:id", deleteParent);
+router.get("/all-parents", getAllParents);
 
 
 

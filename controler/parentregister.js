@@ -9,11 +9,9 @@ export const ParentRegister = async (req, res) => {
   fullName,
 email,
 phone,
-childName,
-childClass,
-childRoll,
+
 password,
-childEmail
+
   
 } = req.body;
 console.log(req.body);
@@ -49,17 +47,9 @@ console.log(req.body);
     }
 
     // Roll Check
-   const rollExists = await db
-  .select()
-  .from(Parent)
-  .where(eq(Parent.childRoll, childRoll));
 
-if (rollExists.length > 0) {
-  return res.status(400).json({
-    success: false,
-    message: "Child Roll Number already exists",
-  });
-}
+
+
 
     // Password Hash
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -68,10 +58,7 @@ if (rollExists.length > 0) {
     // Insert Student
    const Prent = {
   fullName,
-childName,
-childClass,
-childRoll,
-childEmail,
+
 phone,
 email,
 password: hashedPassword,
