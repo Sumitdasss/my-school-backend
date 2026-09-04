@@ -51,6 +51,7 @@ import { addNotice, getNotices } from "../controler/NoticeControler.js";
 import { getStudentProfile } from "../controler/authController.js";
 import { deleteParent, getAllParents, getParentProfile } from "../controler/Parentlogin.js";
 import { deleteTeacher, getAllTeachers, getTeacherProfile } from "../controler/Teacherlogin.js";
+import { addChild,getMyStudents, removeChild } from "../controler/addChild.js";
 router.post("/register", upload.single("photo"), studentRegister);
 router.post("/Parentregister123", upload.single("photo"), ParentRegister);
 router.post("/Teacherregister123", upload.single("photo"), TeacherRegister);
@@ -98,6 +99,21 @@ router.get(
   "/parentprofile",
   parentAuth,
   getParentProfile
+);
+router.post(
+  "/addchild",
+  parentAuth,
+  addChild
+);
+router.get(
+  "/Showaddchild",
+  parentAuth,
+  getMyStudents
+);
+router.delete(
+  "/remove-child/:id",
+  parentAuth,
+  removeChild
 );
 router.get(
   "/teacherprofile",
