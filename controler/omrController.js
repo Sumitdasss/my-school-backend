@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 
 import { calculateOMRResult } from "../services/omrService.js";
 import { db } from "../db/index.js";
+
 import {
   Students,
   MCQExams,
@@ -17,15 +18,23 @@ import {
 // ======================================
 
 export const checkManualOMR = async (req, res) => {
-
   try {
- const studenttId = Number(req.studentId);
-  if (!studenttId) {
+    // ================================
+    // STUDENT AUTHENTICATION
+    // ================================
+
+    const studentId = Number(req.studentId);
+
+    if (!studentId) {
       return res.status(401).json({
         success: false,
         message: "Student authentication required.",
       });
     }
+
+    // ================================
+    // REQUEST DATA
+    // ================================
 
     const {
       examCode,
@@ -45,20 +54,12 @@ export const checkManualOMR = async (req, res) => {
     // VALIDATION
     // ================================
 
-}catch (error) {
-    console.error("Error in checkManualOMR:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
-    }
-if (!examCode) {
+    if (!examCode) {
       return res.status(400).json({
         success: false,
         message: "Exam code is required",
       });
     }
-
 
     if (!setName) {
       return res.status(400).json({
@@ -88,7 +89,11 @@ if (!examCode) {
     const rollDigits = student.rollDigits || [];
 
     const omrRoll = rollDigits
-      .filter((digit) => digit !== null && digit !== undefined)
+      .filter(
+        (digit) =>
+          digit !== null &&
+          digit !== undefined
+      )
       .join("");
 
     if (!omrRoll) {
@@ -107,7 +112,12 @@ if (!examCode) {
     const studentData = await db
       .select()
       .from(Students)
-      .where(eq(Students.rollNumber, Number(omrRoll)));
+      .where(
+        eq(
+          Students.rollNumber,
+          Number(omrRoll)
+        )
+      );
 
     if (studentData.length === 0) {
       return res.status(404).json({
@@ -118,25 +128,10 @@ if (!examCode) {
 
     const foundStudent = studentData[0];
 
-    const alreadySubmitted = await db
-  .select()
-  .from(OMRSubmissions)
-  .where(
-    and(
-      eq(OMRSubmissions.studentId, foundStudent.id),
-      eq(OMRSubmissions.examId, exam.id)
-    )
-  );
-
-if (alreadySubmitted.length > 0) {
-  return res.status(409).json({
-    success: false,
-    alreadySubmitted: true,
-    message: "আপনি ইতিমধ্যে এই পরীক্ষাটি দিয়েছেন।",
-    submissionId: alreadySubmitted[0].id,
-  });
-
-    console.log("Found Student:", foundStudent);
+    console.log(
+      "Found Student:",
+      foundStudent
+    );
 
     // ================================
     // FIND EXAM
@@ -145,7 +140,12 @@ if (alreadySubmitted.length > 0) {
     const examData = await db
       .select()
       .from(MCQExams)
-      .where(eq(MCQExams.examCode, examCode.trim()));
+      .where(
+        eq(
+          MCQExams.examCode,
+          examCode.trim()
+        )
+      );
 
     if (examData.length === 0) {
       return res.status(404).json({
@@ -156,31 +156,82 @@ if (alreadySubmitted.length > 0) {
 
     const exam = examData[0];
 
-    console.log("Found Exam:", exam);
+    console.log(
+      "Found Exam:",
+      exam
+    );
+
+    // ==========================================
+    // CHECK IF STUDENT ALREADY GAVE THIS EXAM
+    // ==========================================
+
+    const alreadySubmitted = await db
+      .select()
+      .from(OMRSubmissions)
+      .where(
+        and(
+          eq(
+            OMRSubmissions.studentId,
+            foundStudent.id
+          ),
+          eq(
+            OMRSubmissions.examId,
+            exam.id
+          )
+        )
+      )
+      .limit(1);
+
+    if (alreadySubmitted.length > 0) {
+      console.log(
+        "Student already submitted this exam"
+      );
+
+      return res.status(409).json({
+        success: false,
+        alreadySubmitted: true,
+        message:
+          "আপনি ইতিমধ্যে এই পরীক্ষাটি দিয়েছেন।",
+        submissionId:
+          alreadySubmitted[0].id,
+      });
+    }
 
     // ================================
-    // CHECK RESULT
+    // CHECK OMR RESULT
     // ================================
 
-    const result = await calculateOMRResult({
-      examCode,
-      setName,
-      detectedAnswers: answers,
-    });
+    const result =
+      await calculateOMRResult({
+        examCode: examCode.trim(),
+        setName,
+        detectedAnswers: answers,
+      });
+
+    console.log(
+      "OMR Result:",
+      result
+    );
+
+    // ================================
+    // REGISTRATION NUMBER
+    // ================================
+
+    const registrationDigits =
+      student.registrationDigits || [];
+
+    const registrationNumber =
+      registrationDigits
+        .filter(
+          (digit) =>
+            digit !== null &&
+            digit !== undefined
+        )
+        .join("");
 
     // ================================
     // SAVE OMR SUBMISSION
     // ================================
-
-    const registrationDigits = student.registrationDigits || [];
-
-    const registrationNumber = registrationDigits
-      .filter(
-        (digit) =>
-          digit !== null &&
-          digit !== undefined
-      )
-      .join("");
 
     const submission = await db
       .insert(OMRSubmissions)
@@ -193,7 +244,8 @@ if (alreadySubmitted.length > 0) {
 
         rollDigits: omrRoll,
 
-        registrationDigits: registrationNumber || null,
+        registrationDigits:
+          registrationNumber || null,
       })
       .returning();
 
@@ -202,60 +254,111 @@ if (alreadySubmitted.length > 0) {
       submission[0]
     );
 
+    // ================================
+    // SAVE STUDENT ANSWERS
+    // ================================
 
-const answerRow=result.details.map((detail)=>({
-submissionId:submission[0].id,
-selectedAnswer: detail.studentAnswer||null,
-studentId: foundStudent.id,
-questionId: detail.questionId,
-isCorrect:detail.status === "unanswer"? null :detail.isCorrect,
+    const answerRows =
+      result.details.map(
+        (detail) => ({
+          submissionId:
+            submission[0].id,
 
-marksObtained:detail.isCorrect ? 1 : 0,
+          selectedAnswer:
+            detail.studentAnswer ||
+            null,
 
+          studentId:
+            foundStudent.id,
 
-}))
+          questionId:
+            detail.questionId,
 
-if(answerRow.length > 0){
+          isCorrect:
+            detail.status ===
+            "unanswer"
+              ? null
+              : detail.isCorrect,
 
-await db.insert(MCQStudentAnswers).values(answerRow)
-}
-console.log(
-  "Student Answers Saved:",
-  answerRow.length
-);
+          marksObtained:
+            detail.isCorrect
+              ? 1
+              : 0,
+        })
+      );
 
-const totalMarks=result.totalQuestions;
-const obtainedMarks=result.marks
+    if (answerRows.length > 0) {
+      await db
+        .insert(MCQStudentAnswers)
+        .values(answerRows);
+    }
 
-const percentage=totalMarks>0?Math.round((obtainedMarks/totalMarks)*100):0
-
-
-const saveResult=await db.insert(MCQResults).values({
-examId:exam.id,
-studentId:foundStudent.id,
-submissionId:submission[0].id,
-totalQuestions:result.totalQuestions,
-correctAnswers:result.correct,
-wrongAnswers:result.wrong,
-skippedAnswers:result.unanswered,
-totalMarks,
-obtainedMarks,
-percentage
-
-
-
-
-
-
-
-
-
-})
-
-
+    console.log(
+      "Student Answers Saved:",
+      answerRows.length
+    );
 
     // ================================
-    // RESPONSE
+    // CALCULATE MARKS
+    // ================================
+
+    const totalMarks =
+      result.totalQuestions;
+
+    const obtainedMarks =
+      result.marks;
+
+    const percentage =
+      totalMarks > 0
+        ? Math.round(
+            (obtainedMarks /
+              totalMarks) *
+              100
+          )
+        : 0;
+
+    // ================================
+    // SAVE MCQ RESULT
+    // ================================
+
+    const saveResult = await db
+      .insert(MCQResults)
+      .values({
+        examId: exam.id,
+
+        studentId:
+          foundStudent.id,
+
+        submissionId:
+          submission[0].id,
+
+        totalQuestions:
+          result.totalQuestions,
+
+        correctAnswers:
+          result.correct,
+
+        wrongAnswers:
+          result.wrong,
+
+        skippedAnswers:
+          result.unanswered,
+
+        totalMarks,
+
+        obtainedMarks,
+
+        percentage,
+      })
+      .returning();
+
+    console.log(
+      "MCQ Result Saved:",
+      saveResult[0]
+    );
+
+    // ================================
+    // SUCCESS RESPONSE
     // ================================
 
     return res.status(200).json({
@@ -265,18 +368,25 @@ percentage
 
       setName,
 
-      submissionId: submission[0].id,
+      submissionId:
+        submission[0].id,
 
       student: {
-  id: foundStudent.id,
-  name: foundStudent.fullName,
-  roll: foundStudent.rollNumber,
-},
+        id: foundStudent.id,
+
+        name: foundStudent.fullName,
+
+        roll:
+          foundStudent.rollNumber,
+      },
 
       result,
     });
-
   } catch (error) {
+    // ================================
+    // ERROR HANDLING
+    // ================================
+
     console.error(
       "Manual OMR Check Error:",
       error
@@ -284,6 +394,7 @@ percentage
 
     return res.status(500).json({
       success: false,
+
       message:
         error.message ||
         "OMR checking failed",
