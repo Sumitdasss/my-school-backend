@@ -221,9 +221,18 @@ export const getMCQResultsByStudent = async (req, res) => {
 // DELETE MCQ RESULT
 // ==========================================
 
+
+// ==========================================
+// DELETE MCQ RESULT
+// ==========================================
+
 export const deleteMCQResult = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // ==========================================
+    // VALIDATE RESULT ID
+    // ==========================================
 
     if (!id || isNaN(Number(id))) {
       return res.status(400).json({
@@ -232,30 +241,94 @@ export const deleteMCQResult = async (req, res) => {
       });
     }
 
-    const deleted = await db
-      .delete(MCQResults)
-      .where(
-        eq(
-          MCQResults.id,
-          Number(id)
-        )
-      )
-      .returning();
+    const resultId = Number(id);
 
-    if (deleted.length === 0) {
+    // ==========================================
+    // FIND RESULT
+    // ==========================================
+
+    const resultData = await db
+      .select({
+        id: MCQResults.id,
+        submissionId: MCQResults.submissionId,
+      })
+      .from(MCQResults)
+      .where(eq(MCQResults.id, resultId))
+      .limit(1);
+
+    // ==========================================
+    // RESULT NOT FOUND
+    // ==========================================
+
+    if (resultData.length === 0) {
       return res.status(404).json({
         success: false,
         message: "MCQ result not found",
       });
     }
 
+    const submissionId = resultData[0].submissionId;
+
+    console.log("=================================");
+    console.log("Deleting MCQ Result:", resultId);
+    console.log("Related Submission:", submissionId);
+    console.log("=================================");
+
+    // ==========================================
+    // DELETE EVERYTHING IN TRANSACTION
+    // ==========================================
+
+    await db.transaction(async (tx) => {
+
+      // ------------------------------------------
+      // DELETE OMR SUBMISSION
+      // ------------------------------------------
+      //
+      // OMRSubmissions delete হলে
+      // MCQStudentAnswers automatically delete হবে
+      // কারণ schema-তে onDelete: "cascade" আছে।
+      //
+
+      await tx
+        .delete(OMRSubmissions)
+        .where(
+          eq(
+            OMRSubmissions.id,
+            submissionId
+          )
+        );
+
+      // ------------------------------------------
+      // DELETE MCQ RESULT
+      // ------------------------------------------
+
+      await tx
+        .delete(MCQResults)
+        .where(
+          eq(
+            MCQResults.id,
+            resultId
+          )
+        );
+    });
+
+    // ==========================================
+    // SUCCESS
+    // ==========================================
+
+    console.log(
+      "MCQ Result deleted successfully:",
+      resultId
+    );
+
     return res.status(200).json({
       success: true,
-      message: "MCQ result deleted successfully",
-      data: deleted[0],
+      message:
+        "MCQ result deleted successfully. Student can take the exam again.",
     });
 
   } catch (error) {
+
     console.error(
       "DELETE MCQ RESULT ERROR:",
       error
@@ -263,7 +336,10 @@ export const deleteMCQResult = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Failed to delete MCQ result",
+      message:
+        "Failed to delete MCQ result",
+      error: error.message,
     });
   }
 };
+
