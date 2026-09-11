@@ -46,16 +46,14 @@ export const studentAuth22 = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
-    // Authorization header আছে কিনা
+
     if (!authHeader) {
       return res.status(401).json({
         success: false,
         message: "Access denied. Token missing",
       });
     }
-
-    // Bearer token আছে কিনা
-    const token = authHeader.startsWith("Bearer ")
+    const token = authHeader.startsWith("Bearer")
       ? authHeader.split(" ")[1]
       : null;
 
@@ -66,13 +64,13 @@ export const studentAuth22 = (req, res, next) => {
       });
     }
 
-    // Token verify
+
     const decoded = jwt.verify(
       token,
       process.env.JWT_SECRET
     );
 
-    // Student token কিনা check
+  
     if (decoded.role !== "student") {
       return res.status(403).json({
         success: false,
@@ -80,7 +78,7 @@ export const studentAuth22 = (req, res, next) => {
       });
     }
    
-    // Request এ student information রাখা
+  
     req.student = decoded;
     req.studentId = decoded.studentId;
 
@@ -92,8 +90,7 @@ export const studentAuth22 = (req, res, next) => {
       return res.status(401).json({
         success: false,
         message: "Token expired. Please login again",
-      });
-    }
+ });}
 
     if (error.name === "JsonWebTokenError") {
       return res.status(401).json({

@@ -1,6 +1,6 @@
 // controllers/omrController.js
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import { calculateOMRResult } from "../services/omrService.js";
 import { db } from "../db/index.js";
@@ -44,7 +44,24 @@ export const checkManualOMR = async (req, res) => {
     // ================================
     // VALIDATION
     // ================================
+const alreadySubmitted = await db
+  .select()
+  .from(OMRSubmissions)
+  .where(
+    and(
+      eq(OMRSubmissions.studentId, foundStudent.id),
+      eq(OMRSubmissions.examId, exam.id)
+    )
+  );
 
+if (alreadySubmitted.length > 0) {
+  return res.status(409).json({
+    success: false,
+    alreadySubmitted: true,
+    message: "আপনি ইতিমধ্যে এই পরীক্ষাটি দিয়েছেন।",
+    submissionId: alreadySubmitted[0].id,
+  });
+}
     if (!examCode) {
       return res.status(400).json({
         success: false,
