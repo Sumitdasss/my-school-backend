@@ -45,13 +45,20 @@ export const checkManualOMR = async (req, res) => {
     // VALIDATION
     // ================================
 
-}
-    if (!examCode) {
+}catch (error) {
+    console.error("Error in checkManualOMR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+    }
+if (!examCode) {
       return res.status(400).json({
         success: false,
         message: "Exam code is required",
       });
     }
+
 
     if (!setName) {
       return res.status(400).json({
