@@ -44,23 +44,7 @@ export const checkManualOMR = async (req, res) => {
     // ================================
     // VALIDATION
     // ================================
-const alreadySubmitted = await db
-  .select()
-  .from(OMRSubmissions)
-  .where(
-    and(
-      eq(OMRSubmissions.studentId, foundStudent.id),
-      eq(OMRSubmissions.examId, exam.id)
-    )
-  );
 
-if (alreadySubmitted.length > 0) {
-  return res.status(409).json({
-    success: false,
-    alreadySubmitted: true,
-    message: "আপনি ইতিমধ্যে এই পরীক্ষাটি দিয়েছেন।",
-    submissionId: alreadySubmitted[0].id,
-  });
 }
     if (!examCode) {
       return res.status(400).json({
@@ -126,6 +110,24 @@ if (alreadySubmitted.length > 0) {
     }
 
     const foundStudent = studentData[0];
+
+    const alreadySubmitted = await db
+  .select()
+  .from(OMRSubmissions)
+  .where(
+    and(
+      eq(OMRSubmissions.studentId, foundStudent.id),
+      eq(OMRSubmissions.examId, exam.id)
+    )
+  );
+
+if (alreadySubmitted.length > 0) {
+  return res.status(409).json({
+    success: false,
+    alreadySubmitted: true,
+    message: "আপনি ইতিমধ্যে এই পরীক্ষাটি দিয়েছেন।",
+    submissionId: alreadySubmitted[0].id,
+  });
 
     console.log("Found Student:", foundStudent);
 
